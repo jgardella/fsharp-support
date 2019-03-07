@@ -29,7 +29,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       if (property != null)
         return new FSharpProperty<AbstractSlot>(this, property.Value);
 
-      return new FSharpMethod<AbstractSlot>(this, mfv);
+      return new FSharpMethod<AbstractSlot>(this);
     }
   }
 }

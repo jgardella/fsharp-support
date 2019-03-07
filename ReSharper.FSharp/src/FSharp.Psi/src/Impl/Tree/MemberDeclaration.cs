@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using JetBrains.Metadata.Reader.API;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement;
 using JetBrains.ReSharper.Plugins.FSharp.Psi.Tree;
@@ -27,7 +27,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
       {
         var cliEvent = property.EventForFSharpProperty?.Value;
         return cliEvent != null
-          ? (ITypeMember) new FSharpCliEvent<MemberDeclaration>(this, cliEvent)
+          ? (ITypeMember) new FSharpCliEvent<MemberDeclaration>(this)
           : new FSharpProperty<MemberDeclaration>(this, property);
       }
 
@@ -37,14 +37,14 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         switch (compiledName)
         {
           case StandardOperatorNames.Explicit:
-            return new FSharpConversionOperator<MemberDeclaration>(this, mfv, true);
+            return new FSharpConversionOperator<MemberDeclaration>(this, true);
           case StandardOperatorNames.Implicit:
-            return new FSharpConversionOperator<MemberDeclaration>(this, mfv, false);
+            return new FSharpConversionOperator<MemberDeclaration>(this, false);
         }
 
-        return new FSharpSignOperator<MemberDeclaration>(this, mfv);
+        return new FSharpSignOperator<MemberDeclaration>(this);
       }
-      return new FSharpMethod<MemberDeclaration>(this, mfv);
+      return new FSharpMethod<MemberDeclaration>(this);
     }
   }
 }

@@ -5,15 +5,13 @@ using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.ExtensionsAPI.DeclaredElements;
 using JetBrains.ReSharper.Psi.Resolve;
 using JetBrains.ReSharper.Psi.Tree;
-using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
   internal abstract class FSharpMethodBase<TDeclaration> : FSharpTypeParametersOwnerBase<TDeclaration>, IMethod
     where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
-    protected FSharpMethodBase([NotNull] ITypeMemberDeclaration declaration,
-      [NotNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration, mfv)
+    protected FSharpMethodBase([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
     {
     }
 

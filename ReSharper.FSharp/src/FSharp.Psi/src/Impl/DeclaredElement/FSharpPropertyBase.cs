@@ -12,7 +12,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
     protected FSharpPropertyBase([NotNull] ITypeMemberDeclaration declaration,
-      [NotNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration, mfv)
+      [NotNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration)
     {
       IsReadable = mfv.HasGetterMethod || mfv.IsPropertyGetterMethod ||
                    mfv.IsModuleValueOrMember && !mfv.IsMember;

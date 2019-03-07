@@ -5,15 +5,13 @@ using JetBrains.ReSharper.Plugins.FSharp.Psi.Util;
 using JetBrains.ReSharper.Psi;
 using JetBrains.ReSharper.Psi.Tree;
 using JetBrains.Util;
-using Microsoft.FSharp.Compiler.SourceCodeServices;
 
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
 {
   internal abstract class FSharpFunctionBase<TDeclaration> : FSharpMemberBase<TDeclaration>, IFunction
     where TDeclaration : IFSharpDeclaration, IModifiersOwnerDeclaration, ITypeMemberDeclaration
   {
-    protected FSharpFunctionBase([NotNull] ITypeMemberDeclaration declaration,
-      [NotNull] FSharpMemberOrFunctionOrValue mfv) : base(declaration, mfv)
+    protected FSharpFunctionBase([NotNull] ITypeMemberDeclaration declaration) : base(declaration)
     {
     }
 
@@ -21,8 +19,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.DeclaredElement
     {
       get
       {
-        var mfv = Mfv;
-        if (mfv == null)
+        if (Mfv is var mfv && mfv == null)
           return EmptyList<IParameter>.Instance;
 
         var mfvCurriedParams = mfv.CurriedParameterGroups;
