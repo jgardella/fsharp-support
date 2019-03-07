@@ -10,13 +10,12 @@ open JetBrains.ReSharper.Psi.ExtensionsAPI
 open JetBrains.ReSharper.Psi.Naming.Impl
 open JetBrains.ReSharper.Refactorings.Rename
 open JetBrains.Util
+open JetBrains.Util.Logging
 open Microsoft.FSharp.Compiler.SourceCodeServices
 open Microsoft.FSharp.Compiler.PrettyNaming
 
 [<AutoOpen>]
 module Util =
-    open JetBrains.Util.Logging
-
     type IRenameWorkflow with
         member x.RenameWorkflow =
             match x with
@@ -63,8 +62,8 @@ type FSharpRenameHelper() =
     override x.IsLanguageSupported = true
 
     override x.IsCheckResolvedTo(newReference, newDeclaredElement) =
-        // We have to change the reference so it resolves to the new element.
-        // We don't, however, want to actually resolve it and to wait for FCS to type check all the needed projects.
+        // To prevent FCS checking changed projects assume the new reference is resolved to the new element.
+        // Binding non-F# elements isn't supported yet so assume it's not resolved.
         newDeclaredElement.PresentationLanguage.Is<FSharpLanguage>()
 
     override x.IsLocalRename(element: IDeclaredElement) =
@@ -106,7 +105,7 @@ type FSharpRenameHelper() =
             | ChangeNameKind.UseSingleName -> fsDeclaredElement.SourceName
             | _ -> fsDeclaredElement.ShortName
 
-        null            
+        null
 
 
 [<ShellFeaturePart>]
@@ -119,7 +118,7 @@ type FSharpAtomicRenamesFactory() =
     override x.CheckRenameAvailability(element: IDeclaredElement) =
         match element with
         | :? FSharpGeneratedMemberBase -> RenameAvailabilityCheckResult.CanNotBeRenamed
-        | :? ILongIdentPat as pat when not pat.IsDeclaration -> RenameAvailabilityCheckResult.CanNotBeRenamed
+        | :? ISynPat as pat when not pat.IsDeclaration -> RenameAvailabilityCheckResult.CanNotBeRenamed
 
         | _ ->
 

@@ -21,12 +21,12 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Util
     [CanBeNull]
     public static IDeclaredType MapBaseType([NotNull] this FSharpEntity entity, IList<ITypeParameter> typeParams,
       [NotNull] IPsiModule psiModule) =>
-      entity.BaseType?.Value is var baseType && baseType != null
+      entity.BaseType?.Value is FSharpType baseType
         ? MapType(baseType, typeParams, psiModule) as IDeclaredType
         : TypeFactory.CreateUnknownType(psiModule);
 
     [NotNull]
-    public static IEnumerable<IDeclaredType> GetSuperTypes([NotNull] FSharpEntity entity,
+    public static IEnumerable<IDeclaredType> MapSuperTypes([NotNull] this FSharpEntity entity,
       IList<ITypeParameter> typeParams, [NotNull] IPsiModule psiModule)
     {
       var interfaces = entity.DeclaredInterfaces;

@@ -59,7 +59,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Parsing
         Create(null, TreeOffset.Zero, TreeOffset.Zero);
 
       public LeafElementBase Create() =>
-        throw new NotImplementedException();
+        Create(null);
     }
 
     private sealed class WhitespaceNodeType : FSharpTokenNodeType

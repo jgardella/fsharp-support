@@ -18,25 +18,27 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
 
     /// May take long time due to waiting for FCS.
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    public IEnumerable<IDeclaredType> SuperTypes => GetFSharpSymbol() is FSharpEntity entity
-      ? FSharpTypesUtil.GetSuperTypes(entity, TypeParameters, GetPsiModule())
-      : EmptyList<IDeclaredType>.Instance;
+    public IEnumerable<IDeclaredType> SuperTypes =>
+      GetFSharpSymbol() is FSharpEntity entity
+        ? entity.MapSuperTypes(TypeParameters, GetPsiModule())
+        : EmptyList<IDeclaredType>.Instance;
 
     /// May take long time due to waiting for FCS.
     [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-    public IDeclaredType BaseClassType => GetFSharpSymbol() is FSharpEntity entity
-      ? entity.MapBaseType(TypeParameters, GetPsiModule())
-      : null;
+    public IDeclaredType BaseClassType =>
+      GetFSharpSymbol() is FSharpEntity entity
+        ? entity.MapBaseType(TypeParameters, GetPsiModule())
+        : null;
 
     public override FSharpSymbol GetFSharpSymbol()
     {
       var symbol = base.GetFSharpSymbol();
-      if (symbol is FSharpEntity || symbol is FSharpUnionCase) return symbol;
+      if (symbol is FSharpEntity || symbol is FSharpUnionCase)
+        return symbol;
 
-      if (!(symbol is FSharpMemberOrFunctionOrValue mfv))
-        return null;
-
-      return mfv.IsConstructor || mfv.IsImplicitConstructor ? mfv.DeclaringEntity?.Value : null;
+      return symbol is FSharpMemberOrFunctionOrValue mfv && (mfv.IsConstructor || mfv.IsImplicitConstructor)
+        ? mfv.DeclaringEntity?.Value
+        : null;
     }
 
     [NotNull]
@@ -103,7 +105,7 @@ namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Impl.Tree
         return result.ReadOnlyList();
       }
     }
-    
+
     public virtual PartKind TypePartKind => PartKind.Class;
   }
 }

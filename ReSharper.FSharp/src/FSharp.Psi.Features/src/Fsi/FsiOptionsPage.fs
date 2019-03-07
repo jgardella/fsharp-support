@@ -34,8 +34,11 @@ type FsiOptionsPage
 
     let fsiOptions = FsiOptionsProvider(lifetime, settings)
 
-    let tools = fsiDetector.GetFsiTools(solution)
-    let autoDetectAllowed = tools.Length > 1
+    let toolOptions = fsiDetector.GetFsiTools(solution)
+
+    let autoDetectAllowed =
+        // There's always the custom fsi tool option, so autodetect is allowed only when any other tools were found.
+        toolOptions.Length > 1
 
     let autoDetect =
         if autoDetectAllowed then fsiOptions.AutoDetect else
@@ -44,13 +47,13 @@ type FsiOptionsPage
     let findTool (path: FileSystemPath) =
         if fsiOptions.IsCustomTool.Value || not autoDetectAllowed then customTool else
 
-        tools
+        toolOptions
         |> Array.tryFind (fun fsi -> fsi.Path = path.Directory)
         |> Option.defaultValue customTool
 
     let parsedPath = fsiOptions.FsiPathAsPath
     let fsiTool =
-            if autoDetect.Value then tools.[0] else
+            if autoDetect.Value then toolOptions.[0] else
             findTool parsedPath
 
     let initialPath = if fsiTool.IsCustom then parsedPath else fsiTool.GetFsiPath(fsiOptions.UseAnyCpu.Value)
@@ -63,10 +66,10 @@ type FsiOptionsPage
         autoDetect.Change.Advise_NoAcknowledgement(lifetime, fun (ArgValue autoDetect) ->
             fsiOptions.AutoDetect.Value <- autoDetect
             fsiTool.Value <-
-                if autoDetect then tools.[0] else
+                if autoDetect then toolOptions.[0] else
 
                 let path = fsiOptions.FsiPathAsPath
-                if path.IsEmpty && autoDetectAllowed then tools.[0] else
+                if path.IsEmpty && autoDetectAllowed then toolOptions.[0] else
                 findTool path)
 
         fsiTool.Change.Advise_NoAcknowledgement(lifetime, fun (ArgValue (FsiTool fsi)) ->
@@ -107,7 +110,7 @@ type FsiOptionsPage
         checkBox.Enabled.Value <- autoDetectAllowed
 
     member x.AddToolChooser() =
-        let options = tools |> Array.map (fun fsi -> RadioOptionPoint(fsi, fsi.Title))
+        let options = toolOptions |> Array.map (fun fsi -> RadioOptionPoint(fsi, fsi.Title))
         let toolComboGrid = x.AddComboOption(fsiTool, fsiToolText, "", "", options) :?> BeGrid
 
         for gridItem in toolComboGrid.Items.Value do
