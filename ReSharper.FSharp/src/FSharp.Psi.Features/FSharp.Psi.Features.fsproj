@@ -66,6 +66,8 @@
     <Compile Include="src\LanguageService\FSharpBreadcrumbsHelper.fs" />
     <Compile Include="src\FSharpTypingAssist.fs" />
     <Compile Include="src\ZoneMarker.fs" />
+    <Compile Include="src\Linter\LintWarning.fs" />
+    <Compile Include="src\Linter\LintAnalyzer.fs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FSharp.Core" Version="$(FSharpCoreVersion)" />
