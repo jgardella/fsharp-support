@@ -1,35 +1,35 @@
-namespace JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages
+namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 
-open FSharp.Compiler.ErrorLogger
+open System
+open System.Collections.Generic
+open FSharp.Compiler
+open FSharp.Compiler.Range
 open FSharpLint.Application
 open JetBrains.DocumentModel
+open JetBrains.ReSharper.Daemon.UsageChecking
 open JetBrains.ReSharper.Feature.Services.Daemon
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Cs.Stages
+open JetBrains.ReSharper.Plugins.FSharp.Daemon.Highlightings
+open JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
-
+open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
 open JetBrains.Util
 
-[<StaticSeverityHighlighting(Severity.WARNING, HighlightingGroupIds.CodeStyleIssues)>]
-type LintWarning (range, lintWarning : LintWarning.Warning) =
-    let toolTip = lintWarning.Info
-    let range = range
-    
-    interface IHighlighting with
-        
-        member __.IsValid () = true
-        
-        member __.ToolTip = toolTip
-        
-        member __.ErrorStripeToolTip = toolTip
-        
-        member __.CalculateRange () = range
 
-type LintStageProcess(fsFile: IFSharpFile, daemonProcess, logger: ILogger) =
-    inherit ErrorsStageProcessBase(fsFile, daemonProcess)
+
+type LintStageProcess(fsFile: IFSharpFile, daemonProcess, logger : ILogger) =
+    inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
 
     let [<Literal>] opName = "LintStageProcess"
 
+    let getDocumentRange (range: Range.range) =
+        let document = daemonProcess.Document
+        let startOffset =  document.GetDocumentOffset(range.StartLine - 1, range.StartColumn)
+        let endOffset = document.GetDocumentOffset(range.EndLine - 1, range.EndColumn)
+        DocumentRange(document, TextRange(startOffset, endOffset))    
+    
     override x.Execute(committer) =
+        let highlightings = List()
         match fsFile.GetParseAndCheckResults(false, opName) with
         | None -> ()
         | Some results ->
@@ -45,28 +45,26 @@ type LintStageProcess(fsFile: IFSharpFile, daemonProcess, logger: ILogger) =
                 let parsedFileInfo = {
                     ParsedFileInformation.Ast = parseTree
                     Source = fsFile.GetText()
-                    TypeCheckResults = None
+                    TypeCheckResults = Some results.CheckResults
                 }
                 let lintResult = Lint.lintParsedSource lintParams parsedFileInfo
                 
                 match lintResult with
                 | LintResult.Success lintWarnings ->
-                    let highlightings = 
-                        lintWarnings
-                        |> List.map (fun warning ->
-                            let document = fsFile.GetSourceFile().Document
-                            let range = DocumentRange(document, warning.Range.StartRange.FileIndex)
-                            let highlighting = LintWarning(range, warning)
-                            HighlightingInfo(range, highlighting))
+                    lintWarnings
+                    |> List.iter (fun warning ->
+                        let range = getDocumentRange warning.Range
+                        let highlighting = LintHighlighting(warning.Info, range)
+                        highlightings.Add(HighlightingInfo(range, highlighting)))
                         
-                    committer.Invoke(DaemonStageResult(highlightings))
-                | LintResult.Failure lintFailure ->
-                    // log failure info
-                    ())
+                | LintResult.Failure lintFailure -> ())
+                
+            logger.Info (sprintf "Committing %d lint warnings" highlightings.Count)
+            committer.Invoke(DaemonStageResult(highlightings))
 
-[<DaemonStage(StagesBefore = [| typeof<TypeCheckErrorsStage> |], StagesAfter = [| |])>]
-type LintStage(logger: ILogger) =
+[<DaemonStage(StagesBefore = [| typeof<TypeCheckErrorsStage> |], StagesAfter = [| typeof<CollectUsagesStage> |])>]
+type LintStage(logger : ILogger) =
     inherit FSharpDaemonStageBase()
 
-    override x.CreateStageProcess(fsFile, _, daemonProcess) =
+    override x.CreateStageProcess(fsFile: IFSharpFile, _, daemonProcess: IDaemonProcess) =
         LintStageProcess(fsFile, daemonProcess, logger) :> _

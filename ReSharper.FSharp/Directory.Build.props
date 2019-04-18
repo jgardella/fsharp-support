@@ -14,10 +14,5 @@
     <ValueTupleVersion>[4.5.0]</ValueTupleVersion>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)resharper-fsharp.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
-
   <Import Project="RiderSdkPackageVersion.props" />
 </Project>

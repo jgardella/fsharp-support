@@ -55,6 +55,12 @@ type UseKeywordIllegalInPrimaryCtor(message, range) =
     inherit FSharpErrorHighlightingBase(message, range)
 
 
+[<StaticSeverityHighlighting(Severity.WARNING, HighlightingGroupIds.CodeStyleIssues,
+                             AttributeId = HighlightingAttributeIds.WARNING_ATTRIBUTE,
+                             OverlapResolve = OverlapResolveKind.NONE)>]
+type LintHighlighting (message, range) =
+    inherit FSharpErrorHighlightingBase(message, range)
+
 [<StaticSeverityHighlighting(Severity.INFO, HighlightingGroupIds.IdentifierHighlightingsGroup,
                              AttributeId = HighlightingAttributeIds.DEADCODE_ATTRIBUTE,
                              OverlapResolve = OverlapResolveKind.NONE)>]
@@ -64,3 +70,5 @@ type DeadCodeHighlighting(range) =
         member x.CalculateRange() = range
         member x.ToolTip = String.Empty
         member x.ErrorStripeToolTip = String.Empty
+        
+

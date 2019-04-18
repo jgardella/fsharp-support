@@ -84,7 +84,10 @@ val libFiles = listOf(
         "FSharp.Common/bin/$buildConfiguration/net461/FSharp.Core.dll",
         "FSharp.Common/bin/$buildConfiguration/net461/FSharp.Compiler.Service.dll", // todo: add pdb after next repack
         "FSharp.Common/bin/$buildConfiguration/net461/FSharp.Compiler.Interactive.Settings.dll",
-        "FSharp.Psi.Features/bin/$buildConfiguration/net461/Fantomas.dll")
+        "FSharp.Psi.Features/bin/$buildConfiguration/net461/Fantomas.dll",
+        "FSharp.Psi.Features/bin/$buildConfiguration/net461/FParsec.dll",
+        "FSharp.Psi.Features/bin/$buildConfiguration/net461/FParsecCS.dll",
+        "FSharp.Psi.Features/bin/$buildConfiguration/net461/FSharpLint.Core.dll")
 
 val pluginFiles = listOf(
         "FSharp.ProjectModelBase/bin/$buildConfiguration/net461/JetBrains.ReSharper.Plugins.FSharp.ProjectModelBase",
