@@ -26,6 +26,7 @@
     <Compile Include="src\Daemon\Stages\TypeCheckErrorsStage.fs" />
     <Compile Include="src\Daemon\Stages\UnusedOpensStage.fs" />
     <Compile Include="src\Daemon\Stages\FormatSpecifiersStage.fs" />
+    <Compile Include="src\Daemon\Stages\LintStage.fs" />
     <Compile Include="src\Daemon\UsageChecking\FSharpUsageCheckingService.fs" />
     <Compile Include="src\Daemon\Analyzers\ReSpellerHelper.fs" />
     <Compile Include="src\Daemon\Analyzers\StringProblemsAnalyzer.fs" />
@@ -66,8 +67,6 @@
     <Compile Include="src\LanguageService\FSharpBreadcrumbsHelper.fs" />
     <Compile Include="src\FSharpTypingAssist.fs" />
     <Compile Include="src\ZoneMarker.fs" />
-    <Compile Include="src\Linter\LintWarning.fs" />
-    <Compile Include="src\Linter\LintAnalyzer.fs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FSharp.Core" Version="$(FSharpCoreVersion)" />
