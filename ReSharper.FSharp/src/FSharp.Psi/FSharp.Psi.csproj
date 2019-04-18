@@ -24,8 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FSharp.Core" Version="4.6.2" />
-    <PackageReference Include="FSharpLint.Core" Version="0.10.8" />
     <PackageReference Include="JetBrains.Rider.SDK" Version="$(RiderSDKVersion)" />
     <PackageReference Include="System.ValueTuple" Version="$(ValueTupleVersion)" />
   </ItemGroup>
