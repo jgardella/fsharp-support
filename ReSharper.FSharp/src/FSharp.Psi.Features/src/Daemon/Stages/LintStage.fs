@@ -1,10 +1,10 @@
 namespace JetBrains.ReSharper.Plugins.FSharp.Psi.Features.Daemon.Stages
 
-open System
 open System.Collections.Generic
 open FSharp.Compiler
 open FSharp.Compiler.Range
 open FSharpLint.Application
+open FSharpLint.Application.ConfigurationManagement
 open JetBrains.DocumentModel
 open JetBrains.ReSharper.Daemon.UsageChecking
 open JetBrains.ReSharper.Feature.Services.Daemon
@@ -13,15 +13,20 @@ open JetBrains.ReSharper.Plugins.FSharp.Daemon.Highlightings
 open JetBrains.ReSharper.Plugins.FSharp.Daemon.Stages
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Tree
 open JetBrains.ReSharper.Plugins.FSharp.Psi.Util
+open JetBrains.ReSharper.Psi
 open JetBrains.Util
-
-
 
 type LintStageProcess(fsFile: IFSharpFile, daemonProcess, logger : ILogger) =
     inherit FSharpDaemonStageProcessBase(fsFile, daemonProcess)
 
     let [<Literal>] opName = "LintStageProcess"
-
+    
+    let config =
+        let (sourceFile:IPsiSourceFile) = daemonProcess.SourceFile
+        match ConfigurationManagement.loadConfigurationForProject (sourceFile.GetLocation().FullPath) with
+        | ConfigurationResult.Success config -> Some config
+        | ConfigurationResult.Failure _ -> None
+    
     let getDocumentRange (range: Range.range) =
         let document = daemonProcess.Document
         let startOffset =  document.GetDocumentOffset(range.StartLine - 1, range.StartColumn)
@@ -36,7 +41,7 @@ type LintStageProcess(fsFile: IFSharpFile, daemonProcess, logger : ILogger) =
             results.ParseResults.ParseTree
             |> Option.iter (fun parseTree ->
                 let lintParams = {
-                    OptionalLintParameters.Configuration = None
+                    OptionalLintParameters.Configuration = config
                     ReceivedWarning = None
                     CancellationToken = None
                     ReportLinterProgress = None
